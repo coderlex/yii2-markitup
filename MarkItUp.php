@@ -1,5 +1,5 @@
 <?php
-namespace yii\markitup;
+namespace coderlex\markitup;
 
 use Yii;
 use yii\widgets\InputWidget;
@@ -13,9 +13,7 @@ class MarkItUp extends InputWidget
 {
 	public $clientOptions = [];
 	public $options = [];
-	public $setName = 'default';
-	public $skinName = 'simple';
-	public $addons = [];
+	public $skin = 'simple';
 
 	public function init()
 	{
@@ -27,22 +25,12 @@ class MarkItUp extends InputWidget
 			$this->options['id'] = $this->getId();
 		}
 		// Register asset bundle
-		$assetBundle = MarkItUpAsset::register($this->getView());
-		$assetPath = Yii::getAlias($assetBundle->sourcePath);
+		$bundle = MarkItUpAsset::register($this->getView());
 		$fileOptions = ['depends' => MarkItUpAsset::className()];
 		$view = $this->getView();
-		// Add setting JS/CSS
-		$settingKey = "markitup-set-{$this->setName}";
-		$view->registerJsFile("{$assetPath}/sets/{$this->setName}/set.js", $fileOptions, $settingKey)
-		$view->registerCssFile("{$assetPath}/sets/{$this->setName}/style.css", $fileOptions, $settingKey);
 		// Add skin CSS
-		$view->registerCssFile("{$assetPath}/skins/{$this->skin}/style.css", $fileOptions, "markitup-skin-{$this->skinName}");
-		// Add addons JS/CSS
-		foreach ($this->addons as $addon) {
-			$addonKey = "markitup-addon-{$addon}";
-			$view->registerJsFile("{$assetPath}/addons/{$addon}/set.js", $fileOptions, $addonKey);
-			$view->registerCssFile("{$assetPath}/addons/{$addon}/style.css", $fileOptions, $addonKey);
-		}
+		if (!empty($this->skin))
+			$view->registerCssFile("{$bundle->baseUrl}/skins/{$this->skin}/style.css", $fileOptions, "markitup-skin-{$this->skin}");
 		// Register script
 		$clientOptions = empty($this->clientOptions) ? '' : Json::encode($this->clientOptions);
 		$this->view->registerJs("jQuery('#{$this->options['id']}').markItUp({$clientOptions});");
@@ -55,21 +43,5 @@ class MarkItUp extends InputWidget
 		} else {
 			echo Html::textarea($this->name, $this->value, $this->options);
 		}
-		$this->renderModalPreview();
-	}
-
-	public function renderModalPreview()
-	{
-		echo Html::beginTag('div', ['id' => 'miuPreview', 'class' => 'modal']);
-		echo Html::beginTag('div', ['class' => 'modal-dialog']);
-		echo Html::beginTag('div', ['class' => 'modal-content']);
-		echo Html::beginTag('div', ['class' => 'modal-header']);
-		echo Html::button('&times;', ["class" => "close", "data-dismiss" => "modal", "aria-hidden" => "true"]);
-		echo Html::tag('h4', 'Preview', ['class' => 'modal-title']);
-		echo Html::endTag('div');
-		echo Html::tag('div', '', ['class' => 'modal-body']);
-		echo Html::endTag('div');
-		echo Html::endTag('div');
-		echo Html::endTag('div');
 	}
 }
