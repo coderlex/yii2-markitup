@@ -1,6 +1,5 @@
 # yii2-markitup
-MarkItUp widget for Yii2
-http://markitup.jaysalvat.com
+MarkItUp (http://markitup.jaysalvat.com) widget for Yii2
 
 ## Install via composer
 
